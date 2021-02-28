@@ -12,10 +12,14 @@ export default new Vuex.Store({
       { id: "999999", name: "Admin", password: "ktgmes", email: "admin@kumhotire.com" },
     ],
     isLogin: false,
+    isAdminLogin: false,
     isLoginError: false,
     loginUser: null,
     loginName: null,
-    userInfo: null
+    userInfo: [
+      { userid: "", name: "",  email: "", dept:"", password: "" }
+    ],
+    isSignin: false,
 
   },
   mutations: {
@@ -24,14 +28,21 @@ export default new Vuex.Store({
       state.isLoginError = false
       state.userInfo = payload
     },
+    adminloginSuccess(state) {
+        state.isAdminLogin = true
+    },
     loginError(state) {
       state.isLogin = false
       state.isLoginError = true
     },
     logout(state) {
       state.isLogin = false;
+      state.isAdminLogin = false;
       state.isLoginError = false;
       state.userInfo = null;
+    },
+    SigninSuccess(state) {
+      state.isSignin = true
     }
   },
   actions: {
@@ -51,15 +62,22 @@ export default new Vuex.Store({
       console.log(userInfo);
       axios
         //.post("http://10.20.226.111:5000/login", {userid: signObj.tfuserid, password: signObj.tfpassword})
-        .post("http://10.20.226.111:5000/login", userInfo)
+        //.post("http://12.29.187.50:5000/login", userInfo)
+        //.post("http://192.169.35.53:6001/login", userInfo)
+        //.post("http://192.168.35.53:6001/login", userInfo)
+        .post("http://localhost:6001/login", userInfo)
         .then(response => {
+          console.log("login response: ")
           console.log(response)
           //if token receive ok -> local storage set..
           //else just exit
           if (response.status === 200) {
             localStorage.setItem('token', response.data.token);
-
+            console.log(response.data);  
             commit("loginSuccess", userInfo)
+            if (userInfo.userid === '100017') {
+              commit("adminloginSuccess")
+            }
             dispatch("getMemberInfo");
             router.push({ name: "ScrapInput" })
           }
@@ -150,16 +168,23 @@ export default new Vuex.Store({
         }
       }
       console.log("token" + token);
-      if(token === '' ||  token === null) return;
+      if (token === '' || token === null) {
+       return; 
+      }
 
       axios
-        .get("http://10.20.226.111:5000/user", config)
+        //.get("http://10.20.226.111:5000/user", config)
+        //.get("http://192.168.35.53:6001/user", config)
+        .get("http://localhost:6001/user", config)
         .then(response => {
+          console.log("user response : ");
           console.log(response.data);
 
           let userInfo = {
             userid: response.data.user.userid,
-            name: response.data.user.name
+            name: response.data.user.name,
+            email: response.data.user.email,
+            dept: response.data.user.dept
           }
           commit("loginSuccess", userInfo);
           router.push({ name: "ScrapInput" })
@@ -175,22 +200,29 @@ export default new Vuex.Store({
       console.log(state.isLogin)
       console.log(signObj)
       
-      let userInfo = {
-        userid: signObj.tfuserid,
-        name: "ktg employee",
-        dept: "Production",
-        email: signObj.tfuserid + "@kumhotire.com",
-        password: signObj.tfpassword
-      }
-
       axios
-        .post("http://10.20.226.111:5000/signin", {userid: signObj.tfuserid, name: "KTG Employee",  dept: "Production", email: signObj.tfuserid + "@kumhotire.com", password: signObj.tfpassword})
+        //.post("http://10.20.226.111:5000/signin", { userid: signObj.tfuserid, name: signObj.tfname, dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword })
+        //.post("http://192.168.35.53:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
+        .post("http://localhost:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
         .then(response => {
           console.log(response)
 
           //if token receive ok -> local storage set..
           //else just exit
-          commit("loginSuccess", userInfo)
+
+          if (response.status === 200) {
+
+            commit("logout")
+            localStorage.clear();
+            router.push({ name: "Login" })
+
+          }
+          else {
+            commit("loginError")
+            localStorage.clear();
+          }
+
+          commit("SigninSuccess");
         })
         .catch(error => {
           console.log(error)
@@ -266,7 +298,7 @@ export default new Vuex.Store({
     logout({ commit }) {
       commit("logout")
       localStorage.clear();
-      router.push({ name: "/login" })
+      router.push({ name: "Login" })
       
     }
   },

@@ -29,7 +29,8 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue')
+    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
+    meta: {keepAlive: true},
   },
   {
     path: '/about',
@@ -37,7 +38,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    meta: {keepAlive: true},
   },
   {
     path: '/profile',
@@ -50,7 +52,8 @@ const routes = [
       {
         path: ":id",
         name: "profileDetail",
-        component: () => import(/* webpackChunkName: "profileDetail" */ '../views/ProfileDetail.vue')
+        component: () => import(/* webpackChunkName: "profileDetail" */ '../views/ProfileDetail.vue'),
+        meta: {keepAlive: true},
       }
     ]
   },
@@ -66,7 +69,8 @@ const routes = [
       {
         path: ":id",
         name: "userDetail",
-        component: () => import(/* webpackChunkName: "userDetail" */ '../views/userDetail.vue')
+        component: () => import(/* webpackChunkName: "userDetail" */ '../views/userDetail.vue'),
+        meta: {keepAlive: true},
       }
     ]
   },
@@ -78,7 +82,16 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "Login" */ '../views/Login.vue'),
+    meta: {keepAlive: true},
   },
+  {
+    path: '/Signin',
+    name: 'Signin',
+     beforeEnter: onlyAuthuser,
+    component: () => import(/* webpackChunkName: "Signin" */ '../views/Signin.vue'),
+    meta: {keepAlive: true},
+  },
+
   {
     path: '/ScrapInput',
     name: 'ScrapInput',
@@ -88,7 +101,84 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "ScrapInput" */ '../views/ScrapInput.vue'),
+    meta: {keepAlive: true},
+  },
+
+  {
+    path: '/ScrapOutHistory',
+    name: 'ScrapOutHistory',
+    beforeEnter: onlyAuthuser,
+    //beforeEnter: rejectAuthuser,
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "ScrapOutHistory" */ '../views/ScrapOutHistory.vue'),
+    meta: {keepAlive: true},
+  },
+
+  {
+    path: '/ScrapDailyReport',
+    name: 'ScrapDailyReport',
+
+    component: () => import(/* webpackChunkName: "ScrapDailyReport" */ '../views/ScrapDailyReport.vue'),
+    meta: {keepAlive: true},
+  },
+
+  {
+    path: '/ItemCode',
+    name: 'ItemCode',
+    beforeEnter: onlyAuthuser,
+    //beforeEnter: rejectAuthuser,
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "ItemCode" */ '../views/ItemCode.vue'),
+    meta: {keepAlive: true},
+  },
+  {
+    path: '/Customer',
+    name: 'Customer',
+    beforeEnter: onlyAuthuser,
+    //beforeEnter: rejectAuthuser,
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "Customer" */ '../views/Customer.vue'),
+    meta: {keepAlive: true},
+  },
+  {
+    path: '/DrawerRight',
+    name: 'DrawerRight',
+    beforeEnter: onlyAuthuser,
+
+    component: () => import(/* webpackChunkName: "DrawerRight" */ '../views/DrawerRight.vue'),
+    meta: {keepAlive: true},
+  },
+  {
+    path: '/DrawerLeft',
+    name: 'DrawerLeft',
+    beforeEnter: onlyAuthuser,
+
+    component: () => import(/* webpackChunkName: "DrawerLeft" */ '../views/DrawerLeft.vue'),
+    meta: {keepAlive: true},
+  },
+  {
+    path: '/Feed',
+    name: 'Feed',
+
+    component: () => import(/* webpackChunkName: "Feed" */ '../views/Feed.vue'),
+    meta: {keepAlive: true},
+  },
+   {
+    path: '/PostItem',
+    name: 'PostItem',
+
+    component: () => import(/* webpackChunkName: "PostItem" */ '../views/PostItem.vue'),
+    meta: {keepAlive: true},
   }
+
+
+
 ]
 
 const router = new VueRouter({

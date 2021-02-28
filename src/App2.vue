@@ -52,52 +52,53 @@
     <!--  dense clipped-left clipped-right color="indigo darken-2" flat dark app -->
     <v-app-bar color="indigo darken-2" dense flat dark app >
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-  
-      <div class="px-3">
-      
-        <v-flex xs12>
-          <v-text-field  placeholder="Search" class="questrial no-top-padding" hide-details prepend-icon="mdi-magnify" single-line ></v-text-field>
-        </v-flex>
+      <v-spacer></v-spacer>      
+      <v-text-field
+        hide-details
+        prepend-icon="mdi-magnify"
+        single-line
+      ></v-text-field>
 
-      </div>
-
-      <!--
       <v-tabs centered class="ml-n1" color="darken-1">
         <v-tab v-for="link in links" :key="link">
           <h3>{{ link }}</h3>
         </v-tab>
       </v-tabs>
-      -->
-     <v-spacer></v-spacer>
-     
-    <div v-if="!isMobile()">
-      <v-flex>
-         <v-row my-2> 
-          <v-col offset="0">
-            <h4 v-if="isLogin">{{ userInfo.name }} </h4> 
-          </v-col>
-          <v-col offset="0">
-            <v-btn small color="secondary" flat v-if="isLogin" @click="$store.dispatch('logout')" >Logout
-              <v-icon right dark> mdi-logout </v-icon>
-            </v-btn >     
-            <v-btn small v-else color="primary" flat class="ma-2 white--text" router :to="{ name: 'Login' }">Login
-              <v-icon right dark> mdi-login </v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-       </v-flex>
-     
-    </div>
-    <div v-else>
-       <v-btn x-small color="secondary" flat v-if="isLogin" @click="$store.dispatch('logout')" >Logout
-         <v-icon right dark> mdi-logout </v-icon>
-      </v-btn >     
-      <v-btn small v-else color="primary" class="ma-2 white--text" router :to="{ name: 'Login' }">Login
-        <v-icon right dark> mdi-login </v-icon>
-      </v-btn>
-    </div>
- 
 
+    
+      <h6 v-if="isLogin">{{ userInfo.name }} {{ userInfo.userid }}</h6>
+
+      <v-btn
+        x-small
+        color="secondary"
+        flat
+        v-if="isLogin"
+        @click="$store.dispatch('logout')"
+        >Logout</v-btn
+      >
+      <v-btn
+        small
+        v-else
+        color="primary"
+        class="ma-2 white--text"
+        router
+        :to="{ name: 'Login' }"
+      >
+        Login
+        <v-icon right dark>
+          mdi-login
+        </v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        x-small
+        color="primary"
+        flat
+        v-if="isAdminLogin"
+        router
+        :to="{ name: 'Signin' }"
+        >Sign in</v-btn
+      >
     </v-app-bar>
     <v-main  class="grey lighten-3" >
       <v-container>
@@ -107,23 +108,69 @@
               <!--  -->
               <v-bottom-navigation>                
                 <v-btn
+                  value="DrawerRight"
+                  router
+                  :to="{name: 'DrawerRight', params:{id:1, name:'DrawerRight'}}"
+                >
+                  <span>DrawerRight</span>
+                  <v-icon large color="blue darken-2">mdi-clock</v-icon>
+                </v-btn>
+
+                <v-btn
                   value="Feed"
                   router
                   :to="{name: 'Feed', params:{id:1, name:'Feed'}}"
                 >
-                  <span>Home</span>
-                   <v-icon large color="blue darken-2">mdi-home </v-icon>
+                  <span>Feed</span>
+                   <v-icon large color="blue darken-2">mdi-message-text </v-icon>
                 </v-btn>                
                 <v-btn
-                  value="Colleagues"
+                  value="ScrapInput"
                   router
-                  :to="{name: 'DrawerRight', params:{id:1, name:'DrawerRight'}}"
+                  :to="{
+                    name: 'ScrapInput',
+                    params: {
+                      userID: 4321,
+                      name: 'winaki',
+                    },
+                    query: {
+                      group: 'member',
+                      catagory: 'trial',
+                    },
+                  }"
                 >
-                  <span>Colleagues</span>
-                  <v-icon large color="blue darken-2">people</v-icon> 
-                </v-btn> 
-               
-                <v-menu
+                  <span>ScrapInOut</span>
+                  <v-icon large color="blue darken-2">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  value="ScrapOutHistory"
+                  router
+                  :to="{
+                    name: 'ScrapOutHistory',
+                    query: {
+                      group: 'member',
+                      catagory: 'trial',
+                    },
+                  }"
+                >
+                  <span>ScrapOutHistory</span>
+                  <v-icon large color="blue darken-2">mdi-monitor</v-icon>
+                </v-btn>
+                <v-btn
+                  value="ScrapDailyReport"
+                  router
+                  :to="{
+                    name: 'ScrapDailyReport',
+                    query: {
+                      group: 'member',
+                      catagory: 'trial',
+                    },
+                  }"
+                >
+                  <span>ScrapDailyReport</span>
+                  <v-icon>mdi-monitor</v-icon>
+                </v-btn>
+                 <v-menu
                     v-for="([text, rounded], index) in subMenuBtns"
                     :key="text"
                     :rounded="rounded"
@@ -136,7 +183,7 @@
                         v-on="on"
                       >
                         <span>{{ text }} </span>
-                        <v-icon large color="blue darken-2">chat</v-icon>
+                        <v-icon>mdi-pencil</v-icon>
                       </v-btn>
                     </template>
 
@@ -198,21 +245,19 @@ export default {
       { text: 'Local System Configuration', icon: 'mdi-cloud-upload' },
     ],
 
-    links: [],
+    links: ["O/D Scrap","Truck-Scale"],
     loginUser: null,
     events: ["click", "mousemove", "mousedown", "scroll", "keypress", "load"],
 
     logoutTimer: null,
 
     subMenuBtns: [
-        ['ScrapList ', '0'],
+        ['Item Code List ', '0'],
       ],
     items: [...Array(4)].map((_, i) => `Item ${i}`),
     colors: ['normal', 'error', 'teal darken-1'],
     subMenuItems: [ 
-                    {title: "ScrapInput"          ,route: "/ScrapInput"}, 
-                    {title: "ScrapOutHistory"     ,route: "/ScrapOutHistory"}, 
-                    {title: "ScrapDailyReport"    ,route: "/ScrapDailyReport"}, 
+                    {title: "Item Code"           ,route: "/ItemCode"}, 
                     {title: "Trade Customer"      ,route: "/Customer"}, 
                     {title: "Customer Trade Item" ,route: "/"},
                     {title: "Catagory"            ,route: "/ScrapOutHistory"}, 
@@ -222,14 +267,6 @@ export default {
   }),
 
   methods: {
-
-    isMobile() {
-      if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
-    },
     test() {
       alert("test");
     },

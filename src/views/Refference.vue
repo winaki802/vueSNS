@@ -1,34 +1,47 @@
 <template>
   <div class="Home">
-    <div class="ma-5 pa-5">
-      <v-card class="mx-auto " max-width="900">
-        <v-img
-          class="white--text align-end"
-          height="400px"
-          src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-        >
-          <v-card-title> 폐기물관리법 </v-card-title>
-        </v-img>
-
-        <v-card-subtitle class="pb-0">
-          법률 제16699호, 12-03-2019
-        </v-card-subtitle>
-
-        <v-card-text class="text--primary">
-          <div>[시행 2020. 12. 4. 타법개정]</div>
-
-          <div>KTG) Kumhotire Georgia Inc.,</div>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-btn color="orange" text>
-            Administration (T.9680)
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <input v-model="greeting" />
+    <h5>
+      폐기물관리법 [시행 2020. 12. 4.] [법률 제16699호, 2019. 12. 3., 타법개정]
+    </h5>
+    <v-btn>winaki</v-btn>
+    <h3>winaki</h3>
+    <div v-if="count === 1">
+      Green
     </div>
+    <div v-else>
+      blue
+      <v-input v-model="email"></v-input>
+      <h2>{{ email }}</h2>
+      <p v-once>{{ email }}</p>
+      <p v-text="email"></p>
+      <div>
+        <ul>
+          <li v-for="cat in cats" v-bind:key="cat.name">
+            {{ cat.name | capitalize | kittity }}
+          </li>
+        </ul>
+      </div>
+      <v-text-field v-model="newCat" @keyup.enter="addKitty"></v-text-field>
+      <v-btn @click="addKitty">+ADD</v-btn>
 
+      <v-text-field
+        v-model="email"
+        label="enter email !!"
+        v-bind:class="[email.length < 6 ? 'red' : 'green']"
+      ></v-text-field>
+      <v-btn onclick="alert('signed up')" :disabled="email.length < 2">
+        submit
+      </v-btn>
+    </div>
     <v-container class="v-1">
+      <v-row>
+        <v-col sm="11" offset="1">
+          <li v-for="question in questions" v-bind:key="question.question">
+            {{ question.question }}
+          </li>
+        </v-col>
+      </v-row>
       <v-row>
         <v-col sm="11" offset="1">
           <li
@@ -40,6 +53,13 @@
           </li>
         </v-col>
       </v-row>
+
+      <v-row>
+        <v-col sm="5" offset="2">
+          <QuestionBox v-bind:question="questions[index]"></QuestionBox>
+        </v-col>
+      </v-row>
+      <v-btn @click="next">next</v-btn>
     </v-container>
 
     <br />
@@ -54,6 +74,7 @@
 
 <script>
 // @ is an alias to /src
+import QuestionBox from "./QuestionBox.vue";
 import Home2 from "./Home2.vue";
 
 export default {
@@ -73,6 +94,8 @@ export default {
             rule:
               "이 법은 폐기물의 발생을 최대한 억제하고 발생한 폐기물을 친환경적으로 처리함으로써 환경보전과 국민생활의 질적 향상에 이바지하는 것을 목적으로 한다.",
           },
+          { rule: "x2" },
+          { rule: "x3" },
         ],
       },
       {
@@ -185,13 +208,14 @@ export default {
 
   name: "Home",
   components: {
+    QuestionBox,
     Home2,
   },
   created() {
     //user is not authorized
-    //if (localStorage.getItem("token") === null) {
-    //  this.$router.push("/login");
-    //}
+    if (localStorage.getItem("token") === null) {
+      this.$router.push("/login");
+    }
   },
 };
 </script>
