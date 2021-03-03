@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div >
     <v-container grid-list-md>
         <v-layout class="justify-center" wrap>
             <v-flex xs12 sm6>
@@ -8,7 +8,7 @@
                     <!-- Posted item #1 -->
                     <v-flex d-inline-flex xs6>
                        
-                        <v-card color="basil"> 
+                        <v-card style="width: 100%" color="basil"> 
                            <v-chip
                             class="ma-2"
                             color="primary"
@@ -138,7 +138,7 @@
     import { mapState } from "vuex";
     import moment from "moment";
     // 파이어베이스 DB 가져옴
-    import { oStorage, oPostingFDB } from '@/datasources/firebase'
+    import { oStorage, oPostingFDB, messagesCollection, firestore, messageQuery} from '@/datasources/firebase'
 
 export default {
 
@@ -209,64 +209,103 @@ export default {
         // 완료, 수정모드 상태값을 DB에 저장 
       fnSubmitTodo() {
 
-        
         //upload images to firestorage 
         const nID = new Date().toISOString();
+        if (this.files.length > 0) {
+            this.files.forEach((file, f) => {                          
+                let uploadTask = oStorage.ref('images').child('pic' + nID + file.name).put(file);
+                uploadTask.on('state_changed', snapshot => {
+                    // state_changed 이벤트를 통해서 얼만큼의 바이트가 업로드 중인지 콘솔에 표시
+                    let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('업로드: ' + progress + '% 완료', snapshot.state);
+                }, error => {
+                    console.log(error)
+                    // 오류 발생 시 콘솔에 표시
+                }, () => {
+                    // -> 성공적으로 업로드 완료 후 파이어베이스 DB에 정보 저장
+                    uploadTask.snapshot.ref.getDownloadURL().then( downloadURL => {
+                    console.log('업로드URL:', downloadURL);     
+                    this.storageFileURLs.push(downloadURL);
 
-        this.files.forEach((file, f) => {                          
-            let uploadTask = oStorage.ref('images').child('pic' + nID + file.name).put(file);
-            uploadTask.on('state_changed', snapshot => {
-                // state_changed 이벤트를 통해서 얼만큼의 바이트가 업로드 중인지 콘솔에 표시
-                let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('업로드: ' + progress + '% 완료', snapshot.state);
-            }, error => {
-                console.log(error)
-                // 오류 발생 시 콘솔에 표시
-            }, () => {
-                // 성공적으로 업로드 완료 후 파이어베이스 DB에 정보 저장
-                uploadTask.snapshot.ref.getDownloadURL().then( downloadURL => {
-                console.log('업로드URL:', downloadURL);     
-                this.storageFileURLs.push(downloadURL);
+                if (this.files.length <= this.storageFileURLs.length) {
+                        let cDate = new Date().toString();        
+                        let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
+                        
+                        //let tfiles = new [];
+                        this.files.forEach((file,idx) => {
+                            this.storageFileNames[idx] = file.name;
+                        });
 
-               if (this.files.length <= this.storageFileURLs.length) {
-                    let cDate = new Date().toString();        
-                    let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
-                    
-                    //let tfiles = new [];
-                    this.files.forEach((file,idx) => {
-                        this.storageFileNames[idx] = file.name;
-                    });
+                        //fire database upload
+                        let PostingInfo = {
+                                pstdat: psdate, 
+                                userid: this.userInfo.userid,
+                                name: this.userInfo.name,
+                                category: this.systemCategory[this.tab].name,
+                                postComment: this.svrRequestText,
+                                storageFileURLs: this.storageFileURLs,
+                                storageFileNames: this.storageFileNames,
+                        };
 
-                    //fire database upload
-                    let PostingInfo = {
-                            pstdat: psdate, 
-                            userid: this.userInfo.userid,
-                            name: this.userInfo.name,
-                            category: this.systemCategory[this.tab].name,
-                            postComment: this.svrRequestText,
-                            storageFileURLs: this.storageFileURLs,
-                            storageFileNames: this.storageFileNames,
-                    };
+                        oPostingFDB.push({
+                        //todo_title: this.svrRequestText,
+                        //b_completed: false,
+                        //b_edit: false,
+                        PostingInfo
+                        });
 
-                    oPostingFDB.push({
-                    //todo_title: this.svrRequestText,
-                    //b_completed: false,
-                    //b_edit: false,
-                    PostingInfo
-                    })
-                    this.svrRequestText = ''
-                    this.storageFileURLs.splice (0, this.storageFileURLs.length);
-                    this.storageFileNames.splice(0, this.storageFileNames.length);
-                    this.files.splice(0,this.files.length);
-                    this.$router.push("/Feed");
-                }
-            });
-            
-            });
-            
-        });   
+                        
+                        messagesCollection.add({
+                                pstdat: psdate, 
+                                userid: this.userInfo.userid,
+                                name: this.userInfo.name,
+                                category: this.systemCategory[this.tab].name,
+                                postComment: this.svrRequestText,
+                                storageFileURLs: this.storageFileURLs,
+                                storageFileNames: this.storageFileNames,
+                            //text: filter.clean(text),
+                            //createdAt: oPostingFDB.FieldValue.serverTimestamp(),
+                            }).then(r => {
+                                console.log(r);
+                            }).then(e => {
+                                console.log(e);
+                            })
 
-        
+
+                        this.svrRequestText = ''
+                        this.storageFileURLs.splice (0, this.storageFileURLs.length);
+                        this.storageFileNames.splice(0, this.storageFileNames.length);
+                        this.files.splice(0,this.files.length);
+                        this.$router.push("/Feed");
+                    }
+                });
+                
+                });
+                
+            });   
+        } else {
+            console.log("no files")
+            let cDate = new Date().toString();        
+            let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
+
+            messagesCollection.add({
+                pstdat: psdate, 
+                userid: this.userInfo.userid,
+                name: this.userInfo.name,
+                category: this.systemCategory[this.tab].name,
+                postComment: this.svrRequestText,
+                storageFileURLs: [],
+                storageFileNames: [],
+            //text: filter.clean(text),
+            //createdAt: oPostingFDB.FieldValue.serverTimestamp(),
+            }).then(r => {
+                console.log(r);
+            }).then(e => {
+                console.log(e);
+            })
+            this.svrRequestText = ''
+            this.$router.push("/Feed");
+        }       
       },
 
         preview_image() 

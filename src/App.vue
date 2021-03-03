@@ -11,11 +11,11 @@
         </v-list-item>
 
         <v-list-item link>
-          <v-list-item-content>
+          <v-list-item-content v-if="isLogin">
             <v-list-item-title class="title">
-              HOJUN SHIN
+              {{ userInfo.name }} 
             </v-list-item-title>
-            <v-list-item-subtitle>winaki@kumhotire.com</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ userInfo.email }} </v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-action>
@@ -69,9 +69,21 @@
       </v-tabs>
       -->
      <v-spacer></v-spacer>
-     
-    <div v-if="!isMobile()">
-      <v-flex>
+     <div v-if="isLogin">
+     <v-btn v-if="userInfo.userid === '100017'" small color="primary" flat class="ma-2 white--text" router :to="{ name: 'Signin' }">Sigin
+              <v-icon right dark> mdi-login </v-icon>
+     </v-btn>
+     </div>
+    <div v-if="!isMobile()" class=".d-none .d-lg-flex .d-xl-none" >      
+      <h4 v-if="isLogin">{{ userInfo.name }} </h4>
+    </div>
+      <v-btn small color="secondary" flat v-if="isLogin" @click="$store.dispatch('logout')" >Logout
+              <v-icon right dark> mdi-logout </v-icon>
+            </v-btn >     
+            <v-btn small v-else color="primary" flat class="ma-2 white--text" router :to="{ name: 'Login' }">Login
+              <v-icon right dark> mdi-login </v-icon>
+      </v-btn>
+      <!--
          <v-row my-2> 
           <v-col offset="0">
             <h4 v-if="isLogin">{{ userInfo.name }} </h4> 
@@ -85,10 +97,8 @@
             </v-btn>
           </v-col>
         </v-row>
-       </v-flex>
-     
-    </div>
-    <div v-else>
+      -->
+    <div v-if="isMobile()" class="d-none d-sm-flex">
        <v-btn x-small color="secondary" flat v-if="isLogin" @click="$store.dispatch('logout')" >Logout
          <v-icon right dark> mdi-logout </v-icon>
       </v-btn >     
@@ -214,7 +224,7 @@ export default {
                     {title: "ScrapOutHistory"     ,route: "/ScrapOutHistory"}, 
                     {title: "ScrapDailyReport"    ,route: "/ScrapDailyReport"}, 
                     {title: "Trade Customer"      ,route: "/Customer"}, 
-                    {title: "Customer Trade Item" ,route: "/"},
+                    {title: "Customer Trade Item" ,route: "/ItemCode"},
                     {title: "Catagory"            ,route: "/ScrapOutHistory"}, 
                     {title: "Truck"               ,route: "/"},
                     {title: "Scale data "         ,route: "/ScrapInput"} 

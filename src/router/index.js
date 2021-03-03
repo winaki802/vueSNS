@@ -165,7 +165,7 @@ const routes = [
   {
     path: '/Feed',
     name: 'Feed',
-
+    beforeEnter: onlyAuthuser,
     component: () => import(/* webpackChunkName: "Feed" */ '../views/Feed.vue'),
     meta: {keepAlive: true},
   },
@@ -175,8 +175,14 @@ const routes = [
 
     component: () => import(/* webpackChunkName: "PostItem" */ '../views/PostItem.vue'),
     meta: {keepAlive: true},
-  }
+  },
+  {
+    path: '/PostReply',
+    name: 'PostReply',
 
+    component: () => import(/* webpackChunkName: "PostReply" */ '../views/PostReply.vue'),
+    meta: {keepAlive: true},
+  }
 
 
 ]

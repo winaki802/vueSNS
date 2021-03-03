@@ -24,7 +24,7 @@
                     </v-flex>
                     <v-btn @click="displaylog">reverse</v-btn>
                     <!-- Posted item #1 -->
-                    <v-flex v-for ="item in oPostLists"  :key="item.key" d-inline-flex xs6>
+                    <v-flex v-for ="item in postLists"  :key="item.key" d-inline-flex xs6>
                         <JeanetteSun :params="item" @delete-item="fnRemoveItem"/>      
                     </v-flex>                    
                 </v-layout>
@@ -40,7 +40,7 @@ import { mapState } from "vuex";
 import JeanetteSun from '../FeedComponents/JeanetteSun';
 
 // 파이어베이스 DB 가져옴
-import { oPostingFDB } from '@/datasources/firebase'
+import { oPostingFDB,messagesQuery } from '@/datasources/firebase'
 
 //https://brosns-881d0-default-rtdb.firebaseio.com/  goolge firebase db 설정
 export default {
@@ -69,6 +69,7 @@ export default {
             ],          
             
         oPostLists: [],
+        postLists: [],
     }),
 
     // 파이어베이스를 쉽게 사용하도록 oTodos 변수로 변경
@@ -76,6 +77,25 @@ export default {
       oPostLists: oPostingFDB
     },
 
+
+
+    created() {
+        
+    },
+
+    beforeUpdate() {
+        //this.oPostLists.reverse();
+        //this.displaylog();
+        
+    },
+
+    Updated() {
+        // this.displaylog();
+    },
+
+    mounted() {
+        this.displaylog();
+    },
     computed: {
         formTitle() {
             return this.editedIndex === -1 ? "New Scrap Item" : "Edit Item";        
@@ -89,8 +109,25 @@ export default {
     },
 
     methods: {
-        displaylog() {
-            this.oPostLists.reverse();
+        async displaylog() {
+            //this.oPostLists.reverse();
+            this.postLists.splice(0,this.postLists.length);
+            let idx = 0;
+            const rst = await messagesQuery.get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        console.log(doc.id, '=>', doc.data());
+                        this.postLists.push(doc.data());
+                        this.postLists[idx].docid = doc.id;
+                        this.postLists[idx].itag = (idx + 1);
+                        idx = idx + 1;
+                    });
+                    //this.postLists.reverse();
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+
         },
         // 전달된 할 일을 DB에서 제거
         fnRemoveItem(selectedItemKey) {    
@@ -99,6 +136,7 @@ export default {
             oPostingFDB.child(pKey).remove();
         },
     },
+
 
 }
 </script>

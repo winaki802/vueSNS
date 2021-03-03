@@ -65,7 +65,9 @@ export default new Vuex.Store({
         //.post("http://12.29.187.50:5000/login", userInfo)
         //.post("http://192.169.35.53:6001/login", userInfo)
         //.post("http://192.168.35.53:6001/login", userInfo)
-        .post("http://localhost:6001/login", userInfo)
+        //.post("http://localhost:6001/login", userInfo)
+        //.post("http://192.168.35.53:6001/login", userInfo)
+        .post("http://12.29.187.50:5000/login", userInfo)
         .then(response => {
           console.log("login response: ")
           console.log(response)
@@ -79,7 +81,8 @@ export default new Vuex.Store({
               commit("adminloginSuccess")
             }
             dispatch("getMemberInfo");
-            router.push({ name: "ScrapInput" })
+            //router.push({ name: "ScrapInput" })
+            router.push({ name: "Feed" })
           }
           else {
             commit("loginError")
@@ -175,7 +178,9 @@ export default new Vuex.Store({
       axios
         //.get("http://10.20.226.111:5000/user", config)
         //.get("http://192.168.35.53:6001/user", config)
-        .get("http://localhost:6001/user", config)
+        //.get("http://localhost:6001/user", config)
+        //.get("http://192.168.35.53:6001/user", config)
+        .get("http://12.29.187.50:5000/user", config)
         .then(response => {
           console.log("user response : ");
           console.log(response.data);
@@ -187,7 +192,7 @@ export default new Vuex.Store({
             dept: response.data.user.dept
           }
           commit("loginSuccess", userInfo);
-          router.push({ name: "ScrapInput" })
+          router.push({ name: "Feed" })
         })
         .catch(() => {
           alert('id and password not correct');
@@ -203,7 +208,9 @@ export default new Vuex.Store({
       axios
         //.post("http://10.20.226.111:5000/signin", { userid: signObj.tfuserid, name: signObj.tfname, dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword })
         //.post("http://192.168.35.53:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
-        .post("http://localhost:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
+        //.post("http://localhost:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
+        //post("http://192.168.35.53:6001/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
+        .post("http://12.29.187.50:5000/signin", {userid: signObj.tfuserid, name: signObj.tfname,  dept: signObj.tfdept, email: signObj.tfemail, password: signObj.tfpassword})
         .then(response => {
           console.log(response)
 
