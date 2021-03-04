@@ -27,12 +27,6 @@ const onlyAuthuser = (to,from, next) => {
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
-    meta: {keepAlive: true},
-  },
-  {
     path: '/about',
     name: 'About',
     // route level code-splitting
@@ -163,7 +157,7 @@ const routes = [
     meta: {keepAlive: true},
   },
   {
-    path: '/Feed',
+    path: '/',
     name: 'Feed',
     beforeEnter: onlyAuthuser,
     component: () => import(/* webpackChunkName: "Feed" */ '../views/Feed.vue'),
@@ -182,6 +176,13 @@ const routes = [
 
     component: () => import(/* webpackChunkName: "PostReply" */ '../views/PostReply.vue'),
     meta: {keepAlive: true},
+  },
+  {
+    path: '/ImageDetail',
+    name: 'ImageDetail',
+
+    component: () => import(/* webpackChunkName: "ImageDetail" */ '../views/ImageDetail.vue'),
+    meta: {keepAlive: false},
   }
 
 

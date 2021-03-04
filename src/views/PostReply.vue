@@ -112,13 +112,19 @@ export default {
     methods: {
         close () {
             console.log("postReplyText : " + this.postReplyText);
-            this.$router.push("/Feed");
+            this.$router.push("/");
         },
         // 완료, 수정모드 상태값을 DB에 저장
       
         fnSubmitTodo() 
         {
-            //upload images to firestorage 
+
+            let _gmt = new Date();  // GMT시간                        
+            let gmtTime = _gmt.toDateString() + " " + _gmt.getHours() + ":" + _gmt.getMinutes() +"(" + navigator.language + ")";
+            let cDate = new Date().toString();        
+            let pstdat = moment(cDate.toString()).format("YYYYMMDDHHmmss");
+
+            //upload images to firestorage             
             const nID = new Date().toISOString();
             if (this.files.length > 0) {
                 this.files.forEach((file, f) => {                          
@@ -136,10 +142,7 @@ export default {
                         console.log('업로드URL:', downloadURL);     
                         this.storageFileURLs.push(downloadURL);
 
-                    if (this.files.length <= this.storageFileURLs.length) {
-                            let cDate = new Date().toString();        
-                            let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
-                            
+                    if (this.files.length <= this.storageFileURLs.length) {                            
                             //let tfiles = new [];
                             this.files.forEach((file,idx) => {
                                 this.storageFileNames[idx] = file.name;
@@ -147,44 +150,43 @@ export default {
 
                             //fire database upload
                             let PostingInfo = {
-                                    replydat: psdate, 
+                                    replydat: pstdat, 
                                     replyuserid: this.userInfo.userid,
                                     replyname: this.userInfo.name,
                                     replyComment: this.postReplyText,
                                     storageFileURLs: this.storageFileURLs,
                                     storageFileNames: this.storageFileNames,
+                                    createdAt: gmtTime,
                             };
-
+                            
+                            /*
                             oPostingFDB.push({
                             //todo_title: this.svrRequestText,
                             //b_completed: false,
                             //b_edit: false,
                             PostingInfo
                             });
+                            */
 
-                            
                             messagesCollection.add({
-                                    pstdat: psdate, 
+                                    pstdat: pstdat, 
                                     userid: this.userInfo.userid,
                                     name: this.userInfo.name,
                                     category: this.systemCategory[this.tab].name,
                                     postComment: this.postReplyText,
                                     storageFileURLs: this.storageFileURLs,
-                                    storageFileNames: this.storageFileNames,
-                                //text: filter.clean(text),
-                                //createdAt: oPostingFDB.FieldValue.serverTimestamp(),
+                                    storageFileNames: this.storageFileNames,                                    
+                                    createdAt: gmtTime,
                                 }).then(r => {
                                     console.log(r);
                                 }).then(e => {
                                     console.log(e);
                                 })
-
-
                             this.postReplyText = ''
                             this.storageFileURLs.splice (0, this.storageFileURLs.length);
                             this.storageFileNames.splice(0, this.storageFileNames.length);
                             this.files.splice(0,this.files.length);
-                            this.$router.push("/Feed");
+                            this.$router.push("/");
                         }
                     });
                     
@@ -193,17 +195,16 @@ export default {
                 });   
             } else {
                 console.log("no files")
-                let cDate = new Date().toString();        
-                let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");            
                 let docid = this.$route.query.docid;
 
                 let postReplys = [{
-                    replydat: psdate, 
+                    replydat: pstdat, 
                     replyuserid: this.userInfo.userid,
                     replyname: this.userInfo.name,
                     replyComment: this.postReplyText,
                     storageFileURLs: this.storageFileURLs,
                     storageFileNames: this.storageFileNames,
+                    createdAt: gmtTime,
                 }];
 
                 console.log(postReplys);
@@ -215,7 +216,7 @@ export default {
                     console.log(e);
                 });
                 this.postReplyText = ''
-                this.$router.push("/Feed");
+                this.$router.push("/");
             }       
         },
         

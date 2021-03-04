@@ -20,6 +20,7 @@
     "firebase": "^7.24.0",
     "firebase-tools": "^9.5.0",
     "ibm_db": "^2.7.2",
+    "javascript-time-ago": "^2.3.4",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^5.11.18",

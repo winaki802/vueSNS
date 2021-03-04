@@ -137,8 +137,13 @@
 <script>
     import { mapState } from "vuex";
     import moment from "moment";
+    import firebase from 'firebase/app'
+    import TimeAgo from 'javascript-time-ago'
+    import en from 'javascript-time-ago/locale/en';
+    //import kr from 'javascript-time-ago/locale/kr';
+
     // 파이어베이스 DB 가져옴
-    import { oStorage, oPostingFDB, messagesCollection, firestore, messageQuery} from '@/datasources/firebase'
+    import { oStorage, oPostingFDB, messagesCollection} from '@/datasources/firebase'
 
 export default {
 
@@ -179,6 +184,7 @@ export default {
         storageFileURLs: [],
         storageFileNames: [],
         insertIdx: 0,
+        days:  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
     }),
 
     // 파이어베이스를 쉽게 사용하도록 oTodos 변수로 변경
@@ -204,11 +210,16 @@ export default {
             console.log("tab : " + this.tab);
             console.log("svrRequestText : " + this.svrRequestText);
 
-            this.$router.push("/Feed");
+            this.$router.push("/");
         },
         // 완료, 수정모드 상태값을 DB에 저장 
       fnSubmitTodo() {
 
+        let _gmt = new Date();  // GMT시간                        
+        let gmtTime = _gmt.toDateString() + " " + _gmt.getHours() + ":" + _gmt.getMinutes() +"(" + navigator.language + ")";
+        let cDate = new Date().toString();        
+        let pstdat = moment(cDate.toString()).format("YYYYMMDDHHmmss");
+        
         //upload images to firestorage 
         const nID = new Date().toISOString();
         if (this.files.length > 0) {
@@ -228,8 +239,6 @@ export default {
                     this.storageFileURLs.push(downloadURL);
 
                 if (this.files.length <= this.storageFileURLs.length) {
-                        let cDate = new Date().toString();        
-                        let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
                         
                         //let tfiles = new [];
                         this.files.forEach((file,idx) => {
@@ -238,45 +247,45 @@ export default {
 
                         //fire database upload
                         let PostingInfo = {
-                                pstdat: psdate, 
+                                pstdat: pstdat, 
                                 userid: this.userInfo.userid,
                                 name: this.userInfo.name,
                                 category: this.systemCategory[this.tab].name,
                                 postComment: this.svrRequestText,
                                 storageFileURLs: this.storageFileURLs,
                                 storageFileNames: this.storageFileNames,
+                                createdAt :gmtTime,
                         };
 
-                        oPostingFDB.push({
+                        //oPostingFDB.push({
                         //todo_title: this.svrRequestText,
                         //b_completed: false,
                         //b_edit: false,
-                        PostingInfo
-                        });
-
+                        //PostingInfo
+                        //});
                         
                         messagesCollection.add({
-                                pstdat: psdate, 
+                                pstdat: pstdat, 
                                 userid: this.userInfo.userid,
                                 name: this.userInfo.name,
                                 category: this.systemCategory[this.tab].name,
                                 postComment: this.svrRequestText,
                                 storageFileURLs: this.storageFileURLs,
                                 storageFileNames: this.storageFileNames,
-                            //text: filter.clean(text),
-                            //createdAt: oPostingFDB.FieldValue.serverTimestamp(),
+                                createdAt : gmtTime,
+                                //createdAt: firebase.firestore.FieldValue.serverTimestamp()
                             }).then(r => {
                                 console.log(r);
                             }).then(e => {
                                 console.log(e);
                             })
 
-
                         this.svrRequestText = ''
                         this.storageFileURLs.splice (0, this.storageFileURLs.length);
                         this.storageFileNames.splice(0, this.storageFileNames.length);
                         this.files.splice(0,this.files.length);
-                        this.$router.push("/Feed");
+                        this.$router.push("/");
+                    
                     }
                 });
                 
@@ -285,27 +294,47 @@ export default {
             });   
         } else {
             console.log("no files")
-            let cDate = new Date().toString();        
-            let psdate = moment(cDate.toString()).format("YYYYMMDDHHmmss");
+            
+            /*
+            setTimeout(() => {
+            const millis = Date.now()
+           
+            //const event = new Date('14 Jun 2017 00:00:00 PDT');
+            //console.log(event.toUTCString());
 
+            let _gmt = new Date();  // GMT시간                        
+            //let _utc = new Date(_gmt.getTime() + (_gmt.getTimezoneOffset() * 60000));  // UTC 시간으로 변환
+            
+            console.log(_gmt);  // Mon Jan 07 2019 18:41:36 GMT+0900 (한국 표준시)
+            console.log(_gmt.toDateString() + " " + _gmt.getHours() + ":" + _gmt.getMinutes() +"(" + navigator.language + ")");
+            
+            //console.log(_utc);  // Mon Jan 07 2019 09:41:36 GMT+0900 (한국 표준시)
+            console.log(_gmt.getTimezoneOffset());
+
+            console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
+            // expected output: seconds elapsed = 2
+            }, 2000);
+            */    
+        
             messagesCollection.add({
-                pstdat: psdate, 
+                pstdat: pstdat, 
                 userid: this.userInfo.userid,
                 name: this.userInfo.name,
                 category: this.systemCategory[this.tab].name,
                 postComment: this.svrRequestText,
                 storageFileURLs: [],
                 storageFileNames: [],
-            //text: filter.clean(text),
-            //createdAt: oPostingFDB.FieldValue.serverTimestamp(),
+                createdAt : gmtTime,
             }).then(r => {
                 console.log(r);
             }).then(e => {
                 console.log(e);
             })
             this.svrRequestText = ''
-            this.$router.push("/Feed");
-        }       
+            this.$router.push("/");
+               
+        } 
+             
       },
 
         preview_image() 

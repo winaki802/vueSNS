@@ -30,6 +30,7 @@ module.exports = {
   },
 
   devServer: {
+    host: '165.141.42.22',
     port: 8081,
     disableHostCheck: true,
     compress: true,

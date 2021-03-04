@@ -8,8 +8,8 @@
                     <v-img :src=avatar1 alt="John"/>
                 </v-list-item-avatar>
                 <v-list-item-content class="mt-2">
-                    <v-list-item-title class="subtitle questrial">{{params.name}} (KTG)</v-list-item-title>
-                    <v-list-item-subtitle class="questrial caption blue--text">2/19 11:30am</v-list-item-subtitle>                    
+                    <v-list-item-title class="subtitle questrial">{{params.name}} {{params.dept}}</v-list-item-title>
+                    <v-list-item-subtitle class="questrial caption blue--text"> {{params.createdAt}}</v-list-item-subtitle>                    
                 </v-list-item-content>
 
                 <v-list-item-action>
@@ -58,7 +58,7 @@
                         :src="`https://picsum.photos/500/300?image=${n *  randomNumber() + 10}`"
                         :lazy-src="`https://picsum.photos/10/6?image=${n * randomNumber() + 10}`"
                         aspect-ratio="4.5"
-                        class="grey lighten-2"
+                        class="grey lighten-2"                        
                         >
                         <template v-slot:placeholder>
                             <v-layout
@@ -82,6 +82,7 @@
                         :lazy-src="image"
                         aspect-ratio="1.0"
                         class="grey lighten-2"
+                        @click="fnDisplayInfo(image)"
                         >
                         <template v-slot:placeholder>
                             <v-layout
@@ -139,7 +140,7 @@
                     <v-layout>
                     <v-flex xs6>
                         <v-layout row >
-                            <div class="questrial caption indigo--text font-weight-bold ml-1 mr-3">Like</div>
+                            <div class="questrial caption indigo--text font-weight-bold ml-1 mr-3">Hit</div>
                             <div class="questrial caption indigo--text font-weight-bold mr-3">Translate</div>
                             <div class="questrial grey--text caption font-weight-bold ml-3">All</div>
                         </v-layout>
@@ -157,17 +158,16 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <div class="questrial font-weight-bold" style="font-size: 14px">{{item.replyname}}</div>
-                    <div class=" questrial font-weight-normal mb-4">{{item.replyComment}}</div>
+                    <div class="questrial font-weight-normal mb-4">{{item.replyComment}}</div>
                     <!--v-list-item-subtitle class="questrial body1 font-weight-medium grey--text text--darken-1 my-2">{{item.replyComment}}</!--v-list-item-subtitle-->
-                    <v-layout>
-                    <v-flex xs6>
-                        <v-layout row>
+                    <v-layout >
+                    <v-flex  cols="12" >
+                        <v-layout class="d-flex flex-row " row>
                             <!-- <v-flex xs12> -->
-                            <div class="questrial caption indigo--text font-weight-bold ml-1 mr-3">Like</div>
-                            <div class="questrial caption indigo--text font-weight-bold mr-3">Translate</div>
-                            <div class="questrial grey--text caption font-weight-bold ml-3">18mins</div>
-                            <!-- </v-flex> -->
-                            
+                                <div class="questrial caption indigo--text font-weight-bold ml-1 mr-3">Hit</div>
+                                <div class="questrial caption indigo--text font-weight-bold mr-3">Translate</div>
+                                <div class="questrial caption grey--text font-weight-bold mr-3"> {{item.createdAt}}</div>
+                            <!--v-list-item-subtitle class="questrial body1 font-weight-medium grey--text text--darken-1 my-2">{{item.createdAt}}</!--v-list-item-subtitle-->
                         </v-layout>
                     </v-flex>
                 </v-layout>
@@ -231,15 +231,15 @@ export default {
 
             let rn = 0;
             rn = Math.ceil(Math.random() * 180);
-            console.log("rn1 :" + rn)
+            //console.log("rn1 :" + rn)
             return rn;
         },
         randomNumber2()  {            
 
             let rn = 0;
             rn = (Math.ceil(Math.random() * 100) % 2) + 1;
-            console.log('rn2 :' + rn);
-            return rn;
+            //console.log('rn2 :' + rn);
+           return rn;
         },
 
         selectSection(item) {
@@ -257,6 +257,16 @@ export default {
                 console.log('Logout')
             }
         },
+
+        // 라우터를 이용해서 세부페이지로 이동할 때 사진의 ID 전달
+        fnDisplayInfo(image) {
+            this.$router.push({
+            name: 'ImageDetail',
+            params: {
+                imageURL: image
+            }
+        })
+      }
 
     },
 }
